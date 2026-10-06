@@ -1,5 +1,4 @@
-import type { AuthInfo } from "@modelcontextprotocol/server";
-import { createMcpHandler, withMcpAuth } from "mcp-handler";
+import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 
 const handler = createMcpHandler((server) => {
@@ -41,33 +40,26 @@ const handler = createMcpHandler((server) => {
   );
 });
 
-const verifyToken = async (
-  _request: Request,
-  bearerToken?: string
-): Promise<AuthInfo | undefined> => {
+async function securedHandler(request: Request) {
   const expectedToken = process.env.MCP_AUTH_TOKEN;
+  const providedToken = request.headers.get("x-mcp-key");
 
-  if (!expectedToken || !bearerToken) {
-    return undefined;
+  if (!expectedToken) {
+    return new Response("MCP_AUTH_TOKEN is not configured", {
+      status: 500,
+    });
   }
 
-  if (bearerToken !== expectedToken) {
-    return undefined;
+  if (providedToken !== expectedToken) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
   }
 
-  return {
-    token: bearerToken,
-    scopes: ["architect:use"],
-    clientId: "claude-web",
-  };
-};
-
-const authHandler = withMcpAuth(handler, verifyToken, {
-  required: true,
-  requiredScopes: ["architect:use"],
-});
+  return handler(request);
+}
 
 export {
-  authHandler as GET,
-  authHandler as POST,
+  securedHandler as GET,
+  securedHandler as POST,
 };
