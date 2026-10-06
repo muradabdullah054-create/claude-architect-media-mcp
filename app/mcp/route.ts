@@ -1,4 +1,5 @@
-import { createMcpHandler } from "mcp-handler";
+import type { AuthInfo } from "@modelcontextprotocol/server";
+import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 
 const handler = createMcpHandler((server) => {
@@ -29,10 +30,44 @@ const handler = createMcpHandler((server) => {
       },
     },
     async ({ message }) => ({
-      content: [{ type: "text", text: `Tool echo: ${message}` }],
+      content: [
+        {
+          type: "text",
+          text: `Tool echo: ${message}`,
+        },
+      ],
       structuredContent: { message },
     })
   );
 });
 
-export { handler as GET, handler as POST };
+const verifyToken = async (
+  _request: Request,
+  bearerToken?: string
+): Promise<AuthInfo | undefined> => {
+  const expectedToken = process.env.MCP_AUTH_TOKEN;
+
+  if (!expectedToken || !bearerToken) {
+    return undefined;
+  }
+
+  if (bearerToken !== expectedToken) {
+    return undefined;
+  }
+
+  return {
+    token: bearerToken,
+    scopes: ["architect:use"],
+    clientId: "claude-web",
+  };
+};
+
+const authHandler = withMcpAuth(handler, verifyToken, {
+  required: true,
+  requiredScopes: ["architect:use"],
+});
+
+export {
+  authHandler as GET,
+  authHandler as POST,
+};
