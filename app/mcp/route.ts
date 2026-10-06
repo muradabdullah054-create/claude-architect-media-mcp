@@ -42,8 +42,7 @@ const handler = createMcpHandler((server) => {
 
 async function securedHandler(request: Request) {
   const expectedToken = process.env.MCP_AUTH_TOKEN;
-  const providedToken = request.headers.get("x-mcp-key");
-
+  const providedToken = request.headers.get("x-api-key");
   if (!expectedToken) {
     return new Response("MCP_AUTH_TOKEN is not configured", {
       status: 500,
