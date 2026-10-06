@@ -177,4 +177,27 @@ const handler = createMcpHandler((server) => {
   );
 });
 
-export { handler as GET, handler as POST };
+async function authenticatedHandler(request: Request) {
+  const expectedToken = process.env.MCP_AUTH_TOKEN;
+
+  if (!expectedToken) {
+    return new Response("MCP_AUTH_TOKEN is not configured.", {
+      status: 500,
+    });
+  }
+
+  const authorization = request.headers.get("authorization");
+
+  if (authorization !== `Bearer ${expectedToken}`) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+
+  return handler(request);
+}
+
+export {
+  authenticatedHandler as GET,
+  authenticatedHandler as POST,
+};
