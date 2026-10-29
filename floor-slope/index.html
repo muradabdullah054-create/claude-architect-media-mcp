@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elfarida Reel — Bathroom Floor Slope (36s)</title>
+  <style>
+    @font-face {
+      font-family: 'TajawalBlack';
+      src: url('fonts/Tajawal-Black.ttf') format('truetype');
+      font-weight: 900;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'TajawalBold';
+      src: url('fonts/Tajawal-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'CairoBold';
+      src: url('fonts/Cairo.ttf') format('truetype');
+      font-weight: 700;
+      font-display: block;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #04162B;
+      font-family: 'CairoBold', sans-serif;
+      color: #F4F6FA;
+      user-select: none;
+    }
+
+    #stage {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 38%, #07284f 0%, #04162B 70%);
+    }
+
+    #gl-canvas {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      display: block;
+    }
+
+    #red-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 42%, rgba(224,69,58,0) 35%, rgba(224,69,58,0.55) 100%);
+      opacity: 0;
+    }
+
+    #top-logo {
+      position: absolute;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 190px;
+      height: auto;
+      z-index: 20;
+      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+    }
+
+    #hud-svg {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .hud-label {
+      font-family: 'CairoBold', sans-serif;
+      font-weight: 700;
+      letter-spacing: 3px;
+      fill: #4FC3F7;
+      font-size: 22px;
+      direction: ltr;
+    }
+
+    .ar-tag-box {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      background: rgba(4, 22, 43, 0.92);
+      border: 2px solid #FFCC00;
+      border-radius: 10px;
+      padding: 8px 20px;
+      font-family: 'TajawalBlack', sans-serif;
+      font-size: 30px;
+      color: #F4F6FA;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 16;
+      opacity: 0;
+    }
+
+    #scan-wipe {
+      position: absolute;
+      left: 0;
+      width: 1080px;
+      height: 10px;
+      background: #FFCC00;
+      box-shadow: 0 0 36px 12px rgba(255, 204, 0, 0.85);
+      z-index: 18;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #bottom-gradient {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 780px;
+      background: linear-gradient(180deg, rgba(4, 22, 43, 0) 0%, rgba(4, 22, 43, 0.88) 28%, #04162B 92%);
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    #caption-band {
+      position: absolute;
+      top: 1250px;
+      left: 60px;
+      width: 960px;
+      height: 550px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      direction: rtl;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    .caption-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: baseline;
+      gap: 14px 18px;
+      max-width: 960px;
+      margin: 8px 0;
+      line-height: 1.32;
+    }
+
+    .word {
+      display: inline-block;
+      font-family: 'CairoBold', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: #F4F6FA;
+      text-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
+      will-change: transform, opacity, filter;
+    }
+
+    .word.big-key {
+      font-family: 'TajawalBlack', sans-serif;
+      font-size: 76px;
+      font-weight: 900;
+      padding: 0 6px;
+    }
+
+    .word.hl-yellow {
+      color: #FFCC00;
+      text-shadow: 0 0 28px rgba(255, 204, 0, 0.45), 0 6px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .word.hl-red {
+      color: #E0453A;
+      text-shadow: 0 0 28px rgba(224, 69, 58, 0.55), 0 6px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .word.hl-water {
+      color: #4FC3F7;
+      text-shadow: 0 0 24px rgba(79, 195, 247, 0.45), 0 6px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    #end-card {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 45%, #062549 0%, #04162B 75%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      direction: rtl;
+    }
+
+    #end-logo {
+      width: 340px;
+      height: auto;
+      margin-bottom: 36px;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
+    }
+
+    #end-brand {
+      font-family: 'TajawalBlack', sans-serif;
+      font-size: 74px;
+      color: #FFCC00;
+      margin-bottom: 28px;
+      text-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
+    }
+
+    #end-sub {
+      font-family: 'CairoBold', sans-serif;
+      font-size: 38px;
+      color: #F4F6FA;
+      max-width: 860px;
+      text-align: center;
+      opacity: 0.92;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="gl-canvas" width="1080" height="1920"></canvas>
+    <div id="red-vignette"></div>
+
+    <img id="top-logo" src="elfarida-logo-transparent.png" alt="Elfarida" />
+
+    <!-- HUD & Leader Lines SVG (Words & Arrows Only — Zero Numbers) -->
+    <svg id="hud-svg" viewBox="0 0 1080 1920">
+      <g id="hud-header">
+        <path d="M 70 215 L 70 185 L 105 185" stroke="#4FC3F7" stroke-width="3" fill="none" />
+        <path d="M 1010 215 L 1010 185 L 975 185" stroke="#4FC3F7" stroke-width="3" fill="none" />
+        <path d="M 70 1120 L 70 1150 L 105 1150" stroke="#4FC3F7" stroke-width="3" fill="none" opacity="0.5" />
+        <path d="M 1010 1120 L 1010 1150 L 975 1150" stroke="#4FC3F7" stroke-width="3" fill="none" opacity="0.5" />
+
+        <text id="hud-left" class="hud-label" x="95" y="212" text-anchor="start">SURVEY VIEW // FLOOR LEVELS</text>
+
+        <g id="hud-status-pill" transform="translate(650, 182)">
+          <rect id="hud-pill-bg" x="0" y="0" width="335" height="42" rx="6" fill="rgba(224,69,58,0.18)" stroke="#E0453A" stroke-width="2" />
+          <text id="hud-right" class="hud-label" x="167" y="28" text-anchor="middle" fill="#E0453A">DRAIN: BLOCKED FLOW ✕</text>
+        </g>
+      </g>
+
+      <g id="leader-lines" opacity="0">
+        <polyline id="leader-poly-1" points="0,0 0,0" stroke="#FFCC00" stroke-width="3" fill="none" />
+        <circle id="leader-dot-1" cx="0" cy="0" r="7" fill="#FFCC00" />
+        <polyline id="leader-poly-2" points="0,0 0,0" stroke="#FFCC00" stroke-width="3" fill="none" />
+        <circle id="leader-dot-2" cx="0" cy="0" r="7" fill="#FFCC00" />
+        <polyline id="leader-poly-3" points="0,0 0,0" stroke="#4FC3F7" stroke-width="3" fill="none" />
+        <circle id="leader-dot-3" cx="0" cy="0" r="7" fill="#4FC3F7" />
+      </g>
+    </svg>
+
+    <div id="tag-1" class="ar-tag-box">المناسيب</div>
+    <div id="tag-2" class="ar-tag-box">الميول</div>
+    <div id="tag-3" class="ar-tag-box" style="border-color:#4FC3F7; color:#4FC3F7;">التصريف</div>
+
+    <div id="layer-tag-tile" class="ar-tag-box">البلاط</div>
+    <div id="layer-tag-adh" class="ar-tag-box">الغراء</div>
+    <div id="layer-tag-screed" class="ar-tag-box" style="background:#FFCC00; color:#04162B;">خلطة الميول</div>
+    <div id="layer-tag-wp" class="ar-tag-box" style="border-color:#4FC3F7;">العزل المائي</div>
+
+    <div id="scan-wipe"></div>
+    <div id="bottom-gradient"></div>
+    <div id="caption-band"></div>
+
+    <div id="end-card">
+      <img id="end-logo" src="elfarida-logo-transparent.png" alt="Elfarida" />
+      <div id="end-brand">الفريدة للإنشاءات</div>
+      <div id="end-sub">تذكّر، التشطيب الممتاز يبدأ من التفاصيل اللي تحت البلاط!</div>
+    </div>
+  </div>
+
+  <script src="three.min.js"></script>
+  <script src="lib/floor3d.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var DURATION = 36.0;
+
+      // The timeline below is authored in "design time" (line slots of the 1.15x take).
+      // voiceover.mp3 is the natural-pace take (34.1s, mixed in with a +0.2s delay), so
+      // render(t) warps video time onto design time piecewise-linearly, line by line.
+      // Pairs: [design s, video s]. Video values = voiceover-timings.txt (A) + 0.2s.
+      // Keep in sync with TIME_WARP in audio/make_audio.py.
+      var TIME_WARP = [
+        [0.00, 0.00],
+        [0.20, 0.20], [4.65, 5.50],     // line 1
+        [4.85, 5.78], [7.05, 8.08],     // line 2
+        [7.25, 8.43], [14.70, 17.14],   // line 3
+        [15.00, 17.48], [21.80, 24.21], // line 4
+        [22.05, 24.61], [26.20, 28.83], // line 5
+        [26.45, 29.23], [33.60, 34.13], // line 6
+        [33.75, 34.25],                 // end card
+        [36.00, 36.00]
+      ];
+
+      function toDesignTime(tv) {
+        for (var i = 0; i < TIME_WARP.length - 1; i++) {
+          var a = TIME_WARP[i];
+          var b = TIME_WARP[i + 1];
+          if (tv <= b[1]) {
+            return a[0] + (b[0] - a[0]) * ((tv - a[1]) / Math.max(1e-6, b[1] - a[1]));
+          }
+        }
+        return TIME_WARP[TIME_WARP.length - 1][0];
+      }
+
+      // Impact hits in video time, on the onset of «ميول» and «تفك» (shake + SFX).
+      // Keep in sync with IMPACT_TIMES in audio/make_audio.py.
+      var IMPACT_TIMES = [6.85, 26.45];
+
+      // Verbatim Saudi script, line slots in design time
+      var NARRATION_LINES = [
+        {
+          id: 1,
+          start: 0.20,
+          end: 4.65,
+          rows: [
+            [
+              { text: 'تدري' },
+              { text: 'وش' },
+              { text: 'السبب' },
+              { text: 'اللي' },
+              { text: 'يخلي' }
+            ],
+            [
+              { text: 'المويه', color: 'water' },
+              { text: 'تتجمع', color: 'red', big: true },
+              { text: 'في' },
+              { text: 'أرضية' },
+              { text: 'الحمام،' }
+            ],
+            [
+              { text: 'حتى' },
+              { text: 'لو' },
+              { text: 'البلاط' },
+              { text: 'جديد؟' }
+            ]
+          ]
+        },
+        {
+          id: 2,
+          start: 4.85,
+          end: 7.05,
+          rows: [
+            [
+              { text: 'غالبًا' },
+              { text: 'المشكلة' },
+              { text: 'في' }
+            ],
+            [
+              { text: 'ميول', color: 'yellow', big: true },
+              { text: 'الأرضية!' }
+            ]
+          ]
+        },
+        {
+          id: 3,
+          start: 7.25,
+          end: 14.70,
+          rows: [
+            [
+              { text: 'قبل' },
+              { text: 'تركيب' },
+              { text: 'البلاط،' },
+              { text: 'لازم' },
+              { text: 'تتأكد' },
+              { text: 'إن' },
+              { text: 'الميل' }
+            ],
+            [
+              { text: 'متجه' },
+              { text: 'بشكل' },
+              { text: 'صحيح' },
+              { text: 'نحو' },
+              { text: 'مصرف' },
+              { text: 'المويه،', color: 'water', big: true }
+            ],
+            [
+              { text: 'وما' },
+              { text: 'فيه' },
+              { text: 'مناطق' },
+              { text: 'منخفضة' },
+              { text: 'تحبسها.' }
+            ]
+          ]
+        },
+        {
+          id: 4,
+          start: 15.00,
+          end: 21.80,
+          rows: [
+            [
+              { text: 'ولا' },
+              { text: 'تعتمد' },
+              { text: 'على' },
+              { text: 'شكل' },
+              { text: 'البلاط' },
+              { text: 'بس!' }
+            ],
+            [
+              { text: 'خلّ' },
+              { text: 'المختص', color: 'yellow', big: true },
+              { text: 'يراجع' },
+              { text: 'المناسيب' },
+              { text: 'والميول،' }
+            ],
+            [
+              { text: 'ويتأكد' },
+              { text: 'من' },
+              { text: 'التصريف.', color: 'water', big: true }
+            ]
+          ]
+        },
+        {
+          id: 5,
+          start: 22.05,
+          end: 26.20,
+          rows: [
+            [
+              { text: 'لأن' },
+              { text: 'الغلطة' },
+              { text: 'هذي' },
+              { text: 'ممكن' },
+              { text: 'تضطرك' }
+            ],
+            [
+              { text: 'تفك', color: 'red', big: true },
+              { text: 'البلاط', color: 'red', big: true },
+              { text: 'وتعيد' },
+              { text: 'الشغل.' }
+            ]
+          ]
+        },
+        {
+          id: 6,
+          start: 26.45,
+          end: 33.60,
+          rows: [
+            [
+              { text: 'تذكّر،' },
+              { text: 'التشطيب' },
+              { text: 'الممتاز' },
+              { text: 'يبدأ' },
+              { text: 'من' }
+            ],
+            [
+              { text: 'التفاصيل', color: 'yellow', big: true },
+              { text: 'اللي' },
+              { text: 'تحت', color: 'yellow', big: true },
+              { text: 'البلاط!', color: 'yellow', big: true }
+            ]
+          ]
+        }
+      ];
+
+      function clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * clamp(t, 0, 1);
+      }
+
+      function smoothstep(e0, e1, x) {
+        var t = clamp((x - e0) / (e1 - e0), 0, 1);
+        return t * t * (3 - 2 * t);
+      }
+
+      function backOut(t) {
+        var c1 = 1.70158;
+        var c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      }
+
+      function catmullRom(p0, p1, p2, p3, t) {
+        var t2 = t * t;
+        var t3 = t2 * t;
+        return 0.5 * (
+          2 * p1 +
+          (-p0 + p2) * t +
+          (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+          (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+        );
+      }
+
+      // Continuous Camera Path (design time): [time, azimuth, radius, height, targetY, fov]
+      var CAM_KEYS = [
+        [0.0,  0.52, 21.0, 13.0, -1.25, 34],
+        [4.8,  0.66, 18.8, 11.8, -1.15, 33],
+        [7.2,  0.82, 18.4, 11.2, -1.10, 33],
+        [14.8, 1.08, 19.2, 12.2, -1.18, 34],
+        [22.0, 0.62, 18.5, 11.4, -1.12, 33],
+        [26.4, 0.44, 18.2, 10.8, -1.10, 33],
+        [33.8, 0.78, 21.6, 11.6, -0.95, 35],
+        [36.0, 0.84, 22.0, 12.0, -0.95, 35]
+      ];
+
+      function sampleCamera(t, tv) {
+        var idx = 0;
+        for (var i = 0; i < CAM_KEYS.length - 1; i++) {
+          if (t >= CAM_KEYS[i][0] && t <= CAM_KEYS[i + 1][0]) {
+            idx = i;
+            break;
+          }
+        }
+        if (t >= CAM_KEYS[CAM_KEYS.length - 1][0]) idx = CAM_KEYS.length - 2;
+
+        var k0 = CAM_KEYS[Math.max(0, idx - 1)];
+        var k1 = CAM_KEYS[idx];
+        var k2 = CAM_KEYS[idx + 1];
+        var k3 = CAM_KEYS[Math.min(CAM_KEYS.length - 1, idx + 2)];
+
+        var span = Math.max(0.0001, k2[0] - k1[0]);
+        var u = clamp((t - k1[0]) / span, 0, 1);
+
+        // Camera shake on the impact words «ميول» and «تفك البلاط» (video time)
+        var shakeAmp = 0;
+        var d0 = tv - IMPACT_TIMES[0];
+        var d1 = tv - IMPACT_TIMES[1];
+        if (d0 > 0 && d0 < 0.75) {
+          shakeAmp = Math.exp(-d0 * 5.5) * 0.34;
+        } else if (d1 > 0 && d1 < 0.85) {
+          shakeAmp = Math.exp(-d1 * 5.0) * 0.42;
+        }
+
+        return {
+          azimuth: catmullRom(k0[1], k1[1], k2[1], k3[1], u),
+          radius: catmullRom(k0[2], k1[2], k2[2], k3[2], u),
+          height: catmullRom(k0[3], k1[3], k2[3], k3[3], u),
+          targetY: catmullRom(k0[4], k1[4], k2[4], k3[4], u),
+          fov: catmullRom(k0[5], k1[5], k2[5], k3[5], u),
+          shakeX: Math.sin(tv * 68) * shakeAmp,
+          shakeY: Math.cos(tv * 83) * shakeAmp
+        };
+      }
+
+      var captionBand = document.getElementById('caption-band');
+      var lineNodes = NARRATION_LINES.map(function (line) {
+        var container = document.createElement('div');
+        container.style.display = 'none';
+        container.style.width = '960px';
+
+        // Words enter at their share of the line's letters, which tracks speech better than equal slots
+        var totalChars = 0;
+        line.rows.forEach(function (r) {
+          r.forEach(function (w) { totalChars += w.text.length; });
+        });
+
+        var wordEls = [];
+        var charsBefore = 0;
+        line.rows.forEach(function (row) {
+          var rowEl = document.createElement('div');
+          rowEl.className = 'caption-row';
+          row.forEach(function (w) {
+            var span = document.createElement('span');
+            span.className = 'word';
+            if (w.big) span.classList.add('big-key');
+            if (w.color === 'yellow') span.classList.add('hl-yellow');
+            if (w.color === 'red') span.classList.add('hl-red');
+            if (w.color === 'water') span.classList.add('hl-water');
+            span.textContent = w.text;
+            rowEl.appendChild(span);
+            wordEls.push({
+              el: span,
+              frac: charsBefore / totalChars
+            });
+            charsBefore += w.text.length;
+          });
+          container.appendChild(rowEl);
+        });
+
+        captionBand.appendChild(container);
+        return {
+          data: line,
+          container: container,
+          words: wordEls
+        };
+      });
+
+      var canvas = document.getElementById('gl-canvas');
+      var floor3d = window.Floor3D.create(canvas, 1080, 1920);
+
+      var hudLeft = document.getElementById('hud-left');
+      var hudRight = document.getElementById('hud-right');
+      var hudPillBg = document.getElementById('hud-pill-bg');
+      var scanWipe = document.getElementById('scan-wipe');
+      var redVignette = document.getElementById('red-vignette');
+      var leaderGroup = document.getElementById('leader-lines');
+      var tag1 = document.getElementById('tag-1');
+      var tag2 = document.getElementById('tag-2');
+      var tag3 = document.getElementById('tag-3');
+      var layerTagTile = document.getElementById('layer-tag-tile');
+      var layerTagAdh = document.getElementById('layer-tag-adh');
+      var layerTagScreed = document.getElementById('layer-tag-screed');
+      var layerTagWp = document.getElementById('layer-tag-wp');
+      var endCard = document.getElementById('end-card');
+
+      function setLeader(polyId, dotId, tagEl, p3d, offsetX, offsetY, alpha) {
+        var poly = document.getElementById(polyId);
+        var dot = document.getElementById(dotId);
+        var s = floor3d.projectToScreen(p3d[0], p3d[1], p3d[2]);
+        var ex = s.x + offsetX;
+        var ey = s.y + offsetY;
+        var mx = s.x + offsetX * 0.45;
+        var my = ey;
+        poly.setAttribute(
+          'points',
+          s.x.toFixed(1) + ',' + s.y.toFixed(1) + ' ' +
+          mx.toFixed(1) + ',' + my.toFixed(1) + ' ' +
+          ex.toFixed(1) + ',' + ey.toFixed(1)
+        );
+        dot.setAttribute('cx', s.x.toFixed(1));
+        dot.setAttribute('cy', s.y.toFixed(1));
+        tagEl.style.left = ex + 'px';
+        tagEl.style.top = (ey - 10) + 'px';
+        tagEl.style.opacity = alpha.toFixed(3);
+      }
+
+      // render(tv): tv is video time in seconds (0..36)
+      window.render = function (tv) {
+        tv = clamp(tv, 0, DURATION);
+        var t = toDesignTime(tv);
+
+        var isFlashback = t >= 22.0 && t < 26.35;
+        var goodBlend = 0;
+        if (t >= 14.6 && t < 22.0) {
+          goodBlend = smoothstep(15.6, 19.2, t);
+        } else if (t >= 26.35) {
+          goodBlend = 1.0;
+        }
+
+        var surveyOpacity = 1.0;
+        if (t >= 14.5 && t < 22.0) {
+          surveyOpacity = 1.0 - smoothstep(14.5, 15.2, t);
+        } else if (isFlashback) {
+          surveyOpacity = 0.65;
+        } else if (t >= 26.35) {
+          surveyOpacity = 0.0;
+        }
+
+        var contourTighten = smoothstep(4.6, 6.2, t) * (1 - smoothstep(14.5, 15.2, t));
+        var redPulse =
+          t >= 7.2 && t < 14.8
+            ? (0.55 + 0.45 * Math.sin(t * 7.5)) * smoothstep(7.4, 8.5, t)
+            : isFlashback
+            ? 0.85
+            : 0;
+
+        var tileOpacity = 1.0;
+        if (t >= 7.2 && t < 14.8) {
+          tileOpacity = lerp(1.0, 0.22, smoothstep(7.2, 8.6, t));
+        }
+
+        var tileLift = 0;
+        if (t >= 14.8 && t < 22.0) {
+          tileLift = smoothstep(15.0, 16.4, t) * (1 - smoothstep(20.9, 21.8, t));
+        }
+
+        // Tiles pop off on «تفك البلاط» (design ≈ 23.86), then drop back before line 6
+        var tilePopBad = 0;
+        if (isFlashback) {
+          tilePopBad = smoothstep(23.75, 24.9, t) * (1 - smoothstep(25.6, 26.3, t));
+        }
+
+        var explode = 0;
+        var screedHighlight = 0;
+        if (t >= 26.35) {
+          explode = smoothstep(27.5, 29.6, t);
+          screedHighlight = smoothstep(29.2, 30.5, t) * (0.7 + 0.3 * Math.sin(t * 6.0));
+        }
+
+        var puddleBad = 0;
+        if (t < 14.9) {
+          puddleBad = smoothstep(0.4, 3.8, t);
+        } else if (isFlashback) {
+          puddleBad = 0.85;
+        }
+        var flowGood = t >= 17.8 && t < 22.0 ? smoothstep(17.8, 19.2, t) : 0;
+
+        var arrowMode = 'survey';
+        var arrowAlpha = 0.75;
+        if (t >= 7.2 && t < 14.8) {
+          arrowMode = 'wrong';
+          arrowAlpha = 0.95;
+        } else if (t >= 14.8 && t < 22.0) {
+          arrowMode = 'good';
+          arrowAlpha = smoothstep(16.4, 17.8, t);
+        } else if (t >= 22.0) {
+          arrowMode = 'none';
+          arrowAlpha = 0;
+        }
+
+        var laserActive =
+          t >= 15.1 && t < 21.8
+            ? smoothstep(15.1, 16.0, t) * (1 - smoothstep(20.8, 21.8, t))
+            : 0;
+
+        var floorTilt =
+          t >= 4.8 && t < 14.8
+            ? smoothstep(4.8, 5.6, t) * (1 - smoothstep(14.0, 14.8, t))
+            : 0;
+
+        var wipeProgress = -1;
+        if (t >= 14.4 && t <= 15.3) {
+          wipeProgress = (t - 14.4) / 0.9;
+          scanWipe.style.opacity = Math.sin(wipeProgress * Math.PI).toFixed(3);
+          scanWipe.style.top = lerp(180, 1180, wipeProgress) + 'px';
+        } else {
+          scanWipe.style.opacity = '0';
+        }
+
+        var redTint = isFlashback
+          ? smoothstep(22.0, 22.6, t) * (1 - smoothstep(25.7, 26.35, t))
+          : 0;
+        redVignette.style.opacity = (redTint * 0.85 + redPulse * 0.25).toFixed(3);
+
+        floor3d.set({
+          time: tv,
+          goodBlend: goodBlend,
+          surveyOpacity: surveyOpacity,
+          contourTighten: contourTighten,
+          redPulse: redPulse,
+          tileOpacity: tileOpacity,
+          tileLift: tileLift,
+          tilePopBad: tilePopBad,
+          explode: explode,
+          screedHighlight: screedHighlight,
+          puddleBad: puddleBad,
+          flowGood: flowGood,
+          arrowMode: arrowMode,
+          arrowAlpha: arrowAlpha,
+          laserActive: laserActive,
+          floorTilt: floorTilt,
+          redTint: redTint,
+          wipeProgress: wipeProgress
+        });
+
+        var cam = sampleCamera(t, tv);
+        floor3d.shot(cam);
+
+        if (t < 14.8 || isFlashback) {
+          hudLeft.textContent = 'SURVEY VIEW // FLOOR LEVELS';
+          hudRight.textContent = 'DRAIN: BLOCKED FLOW ✕';
+          hudRight.setAttribute('fill', '#E0453A');
+          hudPillBg.setAttribute('stroke', '#E0453A');
+          hudPillBg.setAttribute('fill', 'rgba(224,69,58,0.18)');
+        } else {
+          hudLeft.textContent = 'SPECIALIST CHECK // FLOOR LEVELS';
+          hudRight.textContent = 'DRAIN: OPTIMAL FLOW ✓';
+          hudRight.setAttribute('fill', '#FFCC00');
+          hudPillBg.setAttribute('stroke', '#FFCC00');
+          hudPillBg.setAttribute('fill', 'rgba(255,204,0,0.16)');
+        }
+
+        var leaderAlpha =
+          t >= 15.8 && t < 21.6
+            ? smoothstep(15.8, 16.6, t) * (1 - smoothstep(20.9, 21.6, t))
+            : 0;
+        leaderGroup.setAttribute('opacity', leaderAlpha.toFixed(3));
+        if (leaderAlpha > 0.01) {
+          setLeader('leader-poly-1', 'leader-dot-1', tag1, [-0.2, 0.55, 0.1], -170, -95, leaderAlpha);
+          setLeader('leader-poly-2', 'leader-dot-2', tag2, [-0.85, 0.05, -0.6], 180, -110, leaderAlpha);
+          setLeader('leader-poly-3', 'leader-dot-3', tag3, [1.15, -0.05, -1.15], 150, -85, leaderAlpha);
+        } else {
+          tag1.style.opacity = '0';
+          tag2.style.opacity = '0';
+          tag3.style.opacity = '0';
+        }
+
+        var expTagAlpha =
+          t >= 28.5 && t < 33.5
+            ? smoothstep(28.5, 29.3, t) * (1 - smoothstep(32.9, 33.5, t))
+            : 0;
+        if (expTagAlpha > 0.01) {
+          var pTile = floor3d.projectToScreen(-1.9, 0.055 + explode * 0.98, 0.8);
+          var pAdh = floor3d.projectToScreen(1.9, 0.04 + explode * 0.52, -0.4);
+          var pScr = floor3d.projectToScreen(-1.9, explode * 0.05, -0.2);
+          var pWp = floor3d.projectToScreen(1.9, -0.24 - explode * 0.48, 0.6);
+
+          layerTagTile.style.left = (pTile.x - 95) + 'px';
+          layerTagTile.style.top = pTile.y + 'px';
+          layerTagTile.style.opacity = expTagAlpha.toFixed(3);
+
+          layerTagAdh.style.left = (pAdh.x + 95) + 'px';
+          layerTagAdh.style.top = pAdh.y + 'px';
+          layerTagAdh.style.opacity = expTagAlpha.toFixed(3);
+
+          layerTagScreed.style.left = (pScr.x - 120) + 'px';
+          layerTagScreed.style.top = pScr.y + 'px';
+          layerTagScreed.style.opacity = expTagAlpha.toFixed(3);
+
+          layerTagWp.style.left = (pWp.x + 110) + 'px';
+          layerTagWp.style.top = pWp.y + 'px';
+          layerTagWp.style.opacity = expTagAlpha.toFixed(3);
+        } else {
+          layerTagTile.style.opacity = '0';
+          layerTagAdh.style.opacity = '0';
+          layerTagScreed.style.opacity = '0';
+          layerTagWp.style.opacity = '0';
+        }
+
+        lineNodes.forEach(function (ln) {
+          var s = ln.data.start;
+          var e = ln.data.end;
+          var exitDur = 0.28;
+          if (t < s || t > e + exitDur) {
+            ln.container.style.display = 'none';
+            return;
+          }
+          ln.container.style.display = 'block';
+
+          var exitP = smoothstep(e - 0.05, e + exitDur, t);
+          var lineY = -exitP * 38;
+          var lineBlur = exitP * 10;
+          var lineAlpha = 1 - exitP;
+          ln.container.style.transform = 'translateY(' + lineY.toFixed(1) + 'px)';
+          ln.container.style.filter = lineBlur > 0.1 ? 'blur(' + lineBlur.toFixed(1) + 'px)' : 'none';
+          ln.container.style.opacity = lineAlpha.toFixed(3);
+
+          var speakSpan = Math.max(0.2, (e - s) * 0.85);
+          ln.words.forEach(function (w) {
+            var wStart = s + w.frac * speakSpan;
+            var wDur = 0.32;
+            var u = clamp((t - wStart) / wDur, 0, 1);
+            var scale = lerp(0.6, 1.0, backOut(u));
+            var rise = (1 - smoothstep(0, 1, u)) * 50;
+            var blur = (1 - smoothstep(0, 1, u)) * 12;
+            var op = smoothstep(0, 0.45, u);
+
+            w.el.style.opacity = op.toFixed(3);
+            w.el.style.transform = 'translateY(' + rise.toFixed(1) + 'px) scale(' + scale.toFixed(3) + ')';
+            w.el.style.filter = blur > 0.15 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+          });
+        });
+
+        if (t >= 33.75) {
+          var ecP = smoothstep(33.75, 34.35, t);
+          endCard.style.opacity = ecP.toFixed(3);
+        } else {
+          endCard.style.opacity = '0';
+        }
+      };
+
+      document.fonts.ready.then(function () {
+        window.render(0);
+        window.__ready = true;
+      });
+    })();
+  </script>
+</body>
+</html>
